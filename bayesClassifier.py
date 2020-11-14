@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import scipy.stats
 import matplotlib.pyplot as plt
+import itertools
 from tqdm import tqdm
 
 
@@ -23,8 +24,13 @@ class BayesClassifier:
         multiplication = 1
         for x in numOfUniqueValues:
             multiplication *= x
-        # unifor distribution over all variables
-        self.theta = np.ones(numOfUniqueValues)/multiplication
+        """self.theta = {}
+        for col in self.columnsInfo:
+            S[col[0]] = range(col[1])
+        for comb in iterate_values(S):"""
+
+        # uniform distribution over all variables
+        self.theta = np.ones(numOfUniqueValues)/2
         return self.theta
 
     def step(self, row):
@@ -34,15 +40,21 @@ class BayesClassifier:
         n3 = row[3]
         n4 = row[4]
         state = row[-1]
+        # normalization
+        norm = sum(self.theta[n0, n1, n2, n3, n4])
+        """if(norm != 1):
+            p_before = np.array(self.theta[n0, n1, n2, n3, n4])/norm
+        else:"""
         p_before = np.array(self.theta[n0, n1, n2, n3, n4])
-
         # Bayesian updates
         sum_p = 0
         for t in range(2):
             # p = theta[x]
             p = scipy.stats.norm(t, 0.5).pdf(state)
             # theta[t|x] ~ theta[t] * theta[x]
-            self.theta[n0, n1, n2, n3, n4, t] *= p
+            # self.theta[n0, n1, n2, n3, n4, t] *= p
+            self.theta[n0, n1, n2, n3, n4,
+                       t] = self.theta[n0, n1, n2, n3, n4, t] * p
             # this is for the normalization
             sum_p += self.theta[n0, n1, n2, n3, n4, t]
         # normalization
@@ -77,7 +89,13 @@ class BayesClassifier:
             prob_vector = self.theta[row[0], row[1], row[2], row[3], row[4],
                                      :]/sum(self.theta[row[0], row[1], row[2], row[3], row[4], :])
             state = row[5]
-            new_error = np.square(state-prob_vector[state])
+            new_error = np.square(1-prob_vector[state])
             e += new_error
         e /= len(test_set)
         return e
+
+
+def iterate_values(S):
+    keys, values = zip(*S.items())
+    for row in itertools.product(*values):
+        yield dict(zip(keys, row))
