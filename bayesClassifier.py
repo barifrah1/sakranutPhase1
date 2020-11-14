@@ -1,14 +1,17 @@
 import numpy as np
+import pandas as pd
 import scipy.stats
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-from sakranot import DataLoader
 
 
 class BayesClassifier:
 
     def __init__(self, data, columnsInfo):
-        self.data = data
+        if(isinstance(data, pd.DataFrame)):
+            self.data = data.to_numpy(copy=True)
+        else:
+            self.data = data
         self.columnsInfo = columnsInfo
         self.initialize_priors()
 
@@ -58,8 +61,8 @@ class BayesClassifier:
 
     def fit(self):
         self.D_KL = []
-        for i in tqdm(range(len(self.data))):
-            step_dkl = self.step(self.data[i])
+        for row in tqdm(self.data):
+            step_dkl = self.step(row)
             self.D_KL.append(step_dkl)
         return self.theta
 
@@ -70,9 +73,11 @@ class BayesClassifier:
     def calculate_test_error(self, test_set):
         e = 0
         test_set = test_set.to_numpy()
-        for i in range(1, len(test_set)):
-            row = test_set[i]
-            e += np.square(row[5]-self.theta[row[0], row[1],
-                                             row[2], row[3], row[4], row[5]])
-            e /= len(row)
+        for row in test_set:
+            prob_vector = self.theta[row[0], row[1], row[2], row[3], row[4],
+                                     :]/sum(self.theta[row[0], row[1], row[2], row[3], row[4], :])
+            state = row[5]
+            new_error = np.square(state-prob_vector[state])
+            e += new_error
+        e /= len(test_set)
         return e
