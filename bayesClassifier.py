@@ -73,9 +73,13 @@ class BayesClassifier:
 
     def fit(self):
         self.D_KL = []
+        iter = 1
         for row in tqdm(self.data):
             step_dkl = self.step(row)
             self.D_KL.append(step_dkl)
+            if(iter % 10000 == 0):
+                print('mean D_KL for iter ', iter, 'is: ', np.mean(self.D_KL))
+            iter += 1
         return self.theta
 
     def plot_dkl_graph(self):
@@ -86,8 +90,8 @@ class BayesClassifier:
         e = 0
         test_set = test_set.to_numpy()
         for row in test_set:
-            prob_vector = self.theta[row[0], row[1], row[2], row[3], row[4],
-                                     :]/sum(self.theta[row[0], row[1], row[2], row[3], row[4], :])
+            prob_vector = self.theta[row[0], row[1], row[2], row[3], row[4], :]
+
             state = row[5]
             new_error = np.square(1-prob_vector[state])
             e += new_error
