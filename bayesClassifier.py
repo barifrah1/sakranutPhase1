@@ -26,6 +26,8 @@ class BayesClassifier:
         # uniform distribution over all variables
         # 2 options: succuess of falil each has 0.5 probabilty at start time
         self.theta = np.ones(numOfUniqueValues)/2
+        self.theta[:,2,1]=0.9
+        self.theta[:,2,0]=0.1
         return self.theta
 
     def step(self, row):
