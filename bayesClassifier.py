@@ -7,67 +7,53 @@ from tqdm import tqdm
 
 
 class BayesClassifier:
-
+    # constructor
     def __init__(self, data, columnsInfo):
-        if(isinstance(data, pd.DataFrame)):
+        if(isinstance(data, pd.DataFrame)):  # if data is dataframe - convert to array
             self.data = data.to_numpy(copy=True)
         else:
             self.data = data
+        # columns of data and num of unique values - ('country',3) for example
         self.columnsInfo = columnsInfo
-        self.initialize_priors()
+        self.initialize_priors()  # define theta function
 
     def initialize_priors(self):
         # columnsInfo_structure - 'COLUMN_NAME': index 0, 'COLUMN_UNIQUE_VALUES': index 1
         numOfUniqueValues = np.fromiter(
-            map(lambda x: x[1], self.columnsInfo), dtype=np.int)
-        # start with uniform distribution over all paramters
-        multiplication = 1
-        for x in numOfUniqueValues:
-            multiplication *= x
-        """self.theta = {}
-        for col in self.columnsInfo:
-            S[col[0]] = range(col[1])
-        for comb in iterate_values(S):"""
+            map(lambda x: x[1], self.columnsInfo), dtype=np.int)  # create a vector of num of unique value for each column
 
         # uniform distribution over all variables
+        # 2 options: succuess of falil each has 0.5 probabilty at start time
         self.theta = np.ones(numOfUniqueValues)/2
         return self.theta
 
     def step(self, row):
-        n = []
-        for i in range(len(row)):
-            n.append(row[i])
-        """n0 = row[0]
-        n1 = row[1]
-        n2 = row[2]
-        n3 = row[3]
-        n4 = row[4]"""
-        state = row[-1]
-        # normalization
-        #norm = sum(self.theta[n0, n1, n2, n3, n4])
-        """if(norm != 1):
-            p_before = np.array(self.theta[n0, n1, n2, n3, n4])/norm
-        else:"""
-        p_before_as_list = eval("self.theta"+str(n[:-1]))
-        p_before = np.array(p_before_as_list)
+        n = row.tolist()
+        state = row[-1]  # last element in vector  is the state
+        # get the priors probabilities vector for current row
+        p_before = eval("self.theta"+str(n[:-1]))
+        #p_before = np.array(p_before_as_list)
         # Bayesian updates
-        sum_p = 0
+        sum_p = 0  # initialize sum using for normalization part of bayesian update
         for t in range(2):
             # p = theta[x]
             p = scipy.stats.norm(t, 0.5).pdf(state)
             # theta[t|x] ~ theta[t] * theta[x]
-            # self.theta[n0, n1, n2, n3, n4, t] *= p
+            # the next expression equals to  self.theta[n0, n1, n2, n3, n4,..., t] *= p
             exec("self.theta"+str(n[:-1]+[t]) +
                  "= self.theta"+str(n[:-1]+[t])+" * p")
             # this is for the normalization
             sum_p += eval("self.theta"+str(n[:-1]+[t]))
-        # normalization
+        # normalization - divide each element by norm
         for t in range(2):
             exec("self.theta"+str(n[:-1]+[t]) +
                  "/= sum_p ")
+        # posterior probabilities
         p_after = eval("self.theta"+str(n[:-1])+".flatten()")
+        # compute IG between p_before and p_after
         D_KL_t = self.compute_kl_div(p_before, p_after)
         return D_KL_t
+    # get priors and posterior of specific row and compute IG
 
     def compute_kl_div(self, p_before, p_after):
         D_KL_t = 0.0
@@ -75,6 +61,7 @@ class BayesClassifier:
             if p_before[t] > 0.0 and p_after[t] > 0.0:
                 D_KL_t += p_after[t] * np.log2(p_after[t] / p_before[t])
         return D_KL_t
+    #
 
     def fit(self):
         self.D_KL = []
@@ -86,25 +73,27 @@ class BayesClassifier:
                 print('mean D_KL for iter ', iter, 'is: ', np.mean(self.D_KL))
             iter += 1
         return self.theta
+    # plot IG graph of all iterations
 
     def plot_dkl_graph(self):
         plt.plot(self.D_KL)
         plt.show()
 
+    # calculate test error - for inside purposes only
     def calculate_test_error(self, test_set):
         e = 0
         classifier_error = 0
         test_set = test_set.to_numpy()
         for row in test_set:
-            n = []
-            for i in range(len(row)):
-                n.append(row[i])
+            n = row.tolist()
             prob_vector = eval("self.theta"+str(n[:-1]))
-            state = row[5]
+            state = row[-1]  # get state 0-failed 1-success
             new_error = np.square(1-prob_vector[state])
             desicion = 1 if prob_vector[1] >= 0.5 else 0
+            # calculate squared error
             e += new_error
             classifier_error += np.square(state - desicion)
+        # get average error by dividing test size
         e /= len(test_set)
         classifier_error /= len(test_set)
         return e, classifier_error
