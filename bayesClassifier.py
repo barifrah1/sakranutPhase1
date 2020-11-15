@@ -34,18 +34,22 @@ class BayesClassifier:
         return self.theta
 
     def step(self, row):
-        n0 = row[0]
+        n = []
+        for i in range(len(row)):
+            n.append(row[i])
+        """n0 = row[0]
         n1 = row[1]
         n2 = row[2]
         n3 = row[3]
-        n4 = row[4]
+        n4 = row[4]"""
         state = row[-1]
         # normalization
-        norm = sum(self.theta[n0, n1, n2, n3, n4])
+        #norm = sum(self.theta[n0, n1, n2, n3, n4])
         """if(norm != 1):
             p_before = np.array(self.theta[n0, n1, n2, n3, n4])/norm
         else:"""
-        p_before = np.array(self.theta[n0, n1, n2, n3, n4])
+        p_before_as_list = eval("self.theta"+str(n[:-1]))
+        p_before = np.array(p_before_as_list)
         # Bayesian updates
         sum_p = 0
         for t in range(2):
@@ -53,14 +57,15 @@ class BayesClassifier:
             p = scipy.stats.norm(t, 0.5).pdf(state)
             # theta[t|x] ~ theta[t] * theta[x]
             # self.theta[n0, n1, n2, n3, n4, t] *= p
-            self.theta[n0, n1, n2, n3, n4,
-                       t] = self.theta[n0, n1, n2, n3, n4, t] * p
+            exec("self.theta"+str(n[:-1]+[t]) +
+                 "= self.theta"+str(n[:-1]+[t])+" * p")
             # this is for the normalization
-            sum_p += self.theta[n0, n1, n2, n3, n4, t]
+            sum_p += eval("self.theta"+str(n[:-1]+[t]))
         # normalization
         for t in range(2):
-            self.theta[n0, n1, n2, n3, n4, t] /= sum_p
-        p_after = self.theta[n0, n1, n2, n3, n4, :].flatten()
+            exec("self.theta"+str(n[:-1]+[t]) +
+                 "/= sum_p ")
+        p_after = eval("self.theta"+str(n[:-1])+".flatten()")
         D_KL_t = self.compute_kl_div(p_before, p_after)
         return D_KL_t
 
@@ -90,8 +95,10 @@ class BayesClassifier:
         e = 0
         test_set = test_set.to_numpy()
         for row in test_set:
-            prob_vector = self.theta[row[0], row[1], row[2], row[3], row[4], :]
-
+            n = []
+            for i in range(len(row)):
+                n.append(row[i])
+            prob_vector = eval("self.theta"+str(n[:-1]))
             state = row[5]
             new_error = np.square(1-prob_vector[state])
             e += new_error
