@@ -93,6 +93,7 @@ class BayesClassifier:
 
     def calculate_test_error(self, test_set):
         e = 0
+        classifier_error = 0
         test_set = test_set.to_numpy()
         for row in test_set:
             n = []
@@ -101,12 +102,9 @@ class BayesClassifier:
             prob_vector = eval("self.theta"+str(n[:-1]))
             state = row[5]
             new_error = np.square(1-prob_vector[state])
+            desicion = 1 if prob_vector[1] >= 0.5 else 0
             e += new_error
+            classifier_error += np.square(state - desicion)
         e /= len(test_set)
-        return e
-
-
-def iterate_values(S):
-    keys, values = zip(*S.items())
-    for row in itertools.product(*values):
-        yield dict(zip(keys, row))
+        classifier_error /= len(test_set)
+        return e, classifier_error
