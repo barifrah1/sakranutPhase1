@@ -15,6 +15,7 @@ class BayesClassifier:
             self.data = data
         # columns of data and num of unique values - ('country',3) for example
         self.columnsInfo = columnsInfo
+        self.D_KL = []
         self.initialize_priors()  # define theta function
 
     def initialize_priors(self):
@@ -64,7 +65,6 @@ class BayesClassifier:
     #
 
     def fit(self):
-        self.D_KL = []
         iter = 1
         for row in tqdm(self.data):
             step_dkl = self.step(row)
