@@ -31,7 +31,7 @@ class BayesClassifier:
         n = row.tolist()
         state = row[-1]  # last element in vector  is the state
         # get the priors probabilities vector for current row
-        p_before = eval("self.theta"+str(n[:-1]))
+        p_before = np.array(eval("self.theta"+str(n[:-1])))
         #p_before = np.array(p_before_as_list)
         # Bayesian updates
         sum_p = 0  # initialize sum using for normalization part of bayesian update
