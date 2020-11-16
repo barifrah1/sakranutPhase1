@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import itertools
 from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import roc_auc_score
 
 
 class BayesClassifier:
@@ -104,7 +105,7 @@ class BayesClassifier:
         classifier_error /= len(test_set)
         return e, classifier_error
 
-    def confusion_matrix(self, test_set):
+    def confusion_matrix_and_auc(self, test_set):
         pred = []
         test_set = test_set.to_numpy()
         for row in test_set:
@@ -115,4 +116,5 @@ class BayesClassifier:
             pred.append(desicion)
         cm = confusion_matrix(
             test_set[:, -1], pred, np.array([1, 0]), normalize='true')
-        return cm
+        auc = roc_auc_score(test_set[:, -1], pred)
+        return (cm, auc)

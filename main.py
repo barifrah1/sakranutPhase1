@@ -16,7 +16,8 @@ if __name__ == '__main__':
     new_theta = bayes.fit()
     print('final test error: ', bayes.calculate_test_error(test_s)[
           0], ' classifing final test error: ', bayes.calculate_test_error(test_s)[1])
-    print('cm:', bayes.confusion_matrix(test_s))
+    print('cm:', bayes.confusion_matrix_and_auc(test_s)[
+          0], 'auc: ', bayes.confusion_matrix_and_auc(test_s)[1])
     # plot IG graph
     # bayes.plot_dkl_graph()
     smartBayes = CuriousBayesClassifier(train, columnsInfo)
