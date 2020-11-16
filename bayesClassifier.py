@@ -4,6 +4,7 @@ import scipy.stats
 import matplotlib.pyplot as plt
 import itertools
 from tqdm import tqdm
+from sklearn.metrics import confusion_matrix
 
 
 class BayesClassifier:
@@ -15,6 +16,7 @@ class BayesClassifier:
             self.data = data
         # columns of data and num of unique values - ('country',3) for example
         self.columnsInfo = columnsInfo
+        print(self.columnsInfo)
         self.D_KL = []
         self.initialize_priors()  # define theta function
 
@@ -26,8 +28,8 @@ class BayesClassifier:
         # uniform distribution over all variables
         # 2 options: succuess of falil each has 0.5 probabilty at start time
         self.theta = np.ones(numOfUniqueValues)/2
-        self.theta[:,2,1]=0.9
-        self.theta[:,2,0]=0.1
+        """self.theta[:, 2, 1] = 0.9
+        self.theta[:, 2, 0] = 0.1"""
         return self.theta
 
     def step(self, row):
@@ -35,7 +37,7 @@ class BayesClassifier:
         state = row[-1]  # last element in vector  is the state
         # get the priors probabilities vector for current row
         p_before = np.array(eval("self.theta"+str(n[:-1])))
-        #p_before = np.array(p_before_as_list)
+        # p_before = np.array(p_before_as_list)
         # Bayesian updates
         sum_p = 0  # initialize sum using for normalization part of bayesian update
         for t in range(2):
@@ -84,6 +86,7 @@ class BayesClassifier:
     # calculate test error - for inside purposes only
     def calculate_test_error(self, test_set):
         e = 0
+        pred = []
         classifier_error = 0
         test_set = test_set.to_numpy()
         for row in test_set:
@@ -92,6 +95,7 @@ class BayesClassifier:
             state = row[-1]  # get state 0-failed 1-success
             new_error = np.square(1-prob_vector[state])
             desicion = 1 if prob_vector[1] >= 0.5 else 0
+            pred.append(desicion)
             # calculate squared error
             e += new_error
             classifier_error += np.square(state - desicion)
@@ -99,3 +103,16 @@ class BayesClassifier:
         e /= len(test_set)
         classifier_error /= len(test_set)
         return e, classifier_error
+
+    def confusion_matrix(self, test_set):
+        pred = []
+        test_set = test_set.to_numpy()
+        for row in test_set:
+            n = row.tolist()
+            prob_vector = eval("self.theta"+str(n[:-1]))
+            state = row[-1]  # get state 0-failed 1-success
+            desicion = 1 if prob_vector[1] >= 0.5 else 0
+            pred.append(desicion)
+        cm = confusion_matrix(
+            test_set[:, -1], pred, np.array([1, 0]), normalize='true')
+        return cm

@@ -9,7 +9,7 @@ import seaborn as sns
 class DataLoader:
     def __init__(self, args):
         self.args = args
-        self.data = pd.read_csv(self.args['fileName'])
+        self.data = pd.read_csv(self.args['fileName'], nrows=50000)
 
     def split_train_test(self):
         msk = np.random.rand(len(self.data)) < self.args['trainSize']
@@ -42,7 +42,8 @@ class DataLoader:
         cat_columns = ['category', 'main_category',
                        'currency', 'state', 'country']
         # convert to categorial var
-        self.data['ratio']=(self.data['usd_pledged_real'])/(self.data['usd_goal_real'])
+        self.data['ratio'] = (self.data['usd_pledged_real']
+                              )/(self.data['usd_goal_real'])
         self.data['category'] = self.data['category'].astype('category')
         self.data['main_category'] = self.data['main_category'].astype(
             'category')
@@ -62,7 +63,7 @@ class DataLoader:
         self.data['goal_level'] = 0  # 0 - low ,1-mid,2 - high,3-very high
         self.data['pledged_level'] = 0  # 0 - low ,1-mid,2 - high,3-very high
         self.data['duration_level'] = 0  # 0 - short-mid , 1-mid-long ,
-        self.data['ratio_level']=0
+        self.data['ratio_level'] = 0
         # goal bins according distribution
         self.data.loc[(self.data['usd_goal_real'] <= 2000), 'goal_level'] = 0
         self.data.loc[((self.data['usd_goal_real'] > 2000) & (
@@ -83,16 +84,19 @@ class DataLoader:
         self.data.loc[(self.data['duration'] <= 30), 'duration_level'] = 0
         self.data.loc[(self.data['duration'] > 30), 'duration_level'] = 1
 
-        #ratio bins
-        self.data.loc[(self.data['ratio']<=0.5),'ratio_level']=0
-        self.data.loc[((self.data['ratio']>0.5) & (self.data['ratio']<=0.99)),'ratio_level']=1
-        self.data.loc[(self.data['ratio']>0.99),'ratio_level']=2
+        # ratio bins
+        self.data.loc[(self.data['ratio'] <= 0.5), 'ratio_level'] = 0
+        self.data.loc[((self.data['ratio'] > 0.5) & (
+            self.data['ratio'] <= 0.99)), 'ratio_level'] = 1
+        self.data.loc[(self.data['ratio'] > 0.99), 'ratio_level'] = 2
         # phase 3 of drops results of bins creation
         self.data = self.data.drop(
-            ['usd_pledged_real', 'usd_goal_real', 'duration','ratio'], 1)
+            ['usd_pledged_real', 'usd_goal_real', 'duration', 'ratio'], 1)
         # reorder columns
+        """self.data = self.data[['main_category', 'country', 'goal_level',
+                               'pledged_level', 'duration_level','ratio_level', 'state']]"""
         self.data = self.data[['main_category', 'country', 'goal_level',
-                               'pledged_level', 'duration_level','ratio_level', 'state']]
+                               'duration_level', 'state']]
         data_Arr = self.data.values
         columns_names = list(self.data.columns)
         # list with tuple (column,unique value range)
