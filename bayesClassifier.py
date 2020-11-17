@@ -25,7 +25,6 @@ class BayesClassifier:
         # columnsInfo_structure - 'COLUMN_NAME': index 0, 'COLUMN_UNIQUE_VALUES': index 1
         numOfUniqueValues = np.fromiter(
             map(lambda x: x[1], self.columnsInfo), dtype=np.int)  # create a vector of num of unique value for each column
-
         # uniform distribution over all variables
         # 2 options: succuess of falil each has 0.5 probabilty at start time
         self.theta = np.ones(numOfUniqueValues)/2

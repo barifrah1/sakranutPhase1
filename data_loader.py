@@ -9,7 +9,7 @@ import seaborn as sns
 class DataLoader:
     def __init__(self, args):
         self.args = args
-        self.data = pd.read_csv(self.args['fileName'], nrows=200000)
+        self.data = pd.read_csv(self.args['fileName'], nrows=100000)
 
     def split_train_test(self):
         msk = np.random.rand(len(self.data)) < self.args['trainSize']
@@ -39,7 +39,9 @@ class DataLoader:
         # => US and gb is almost 80% of the self.data =>dimension reduction
         self.data.loc[~self.data['country'].isin(
             ['US', 'GB']), 'country'] = 'OTHER'
-        cat_columns = ['category', 'main_category',
+        self.data['cat_sub_cat'] = self.data['main_category'] + \
+            '_'+self.data['category']
+        cat_columns = ['cat_sub_cat',
                        'currency', 'state', 'country']
         # convert to categorial var
         self.data['ratio'] = (self.data['usd_pledged_real']
@@ -47,6 +49,9 @@ class DataLoader:
         self.data['category'] = self.data['category'].astype('category')
         self.data['main_category'] = self.data['main_category'].astype(
             'category')
+        self.data['cat_sub_cat'] = self.data['cat_sub_cat'].astype(
+            'category')
+
         self.data['currency'] = self.data['currency'].astype('category')
         self.data['state'] = self.data['state'].astype('category')
         self.data['country'] = self.data['country'].astype('category')
@@ -95,7 +100,7 @@ class DataLoader:
         # reorder columns
         """self.data = self.data[['main_category', 'country', 'goal_level',
                                'pledged_level', 'duration_level','ratio_level', 'state']]"""
-        self.data = self.data[['main_category', 'country', 'goal_level',
+        self.data = self.data[['cat_sub_cat', 'country', 'goal_level',
                                'duration_level', 'state']]
         data_Arr = self.data.values
         columns_names = list(self.data.columns)
