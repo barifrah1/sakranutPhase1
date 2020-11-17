@@ -80,7 +80,11 @@ class BayesClassifier:
     # plot IG graph of all iterations
 
     def plot_dkl_graph(self):
-        plt.plot(self.D_KL)
+        compressed_IG = []
+        for iter in range(int(len(self.D_KL)/1000)):
+            compressed_IG.append(
+                np.mean(self.D_KL[iter*1000:(iter*1000+1000)]))
+        plt.plot(compressed_IG)
         plt.show()
 
     # calculate test error - for inside purposes only

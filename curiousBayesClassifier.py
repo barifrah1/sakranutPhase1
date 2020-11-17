@@ -58,10 +58,6 @@ class CuriousBayesClassifier(BayesClassifier):
             iter += 1
         return self.theta
 
-    def plot_dkl_graph(self):
-        plt.plot(self.D_KL)
-        plt.show()
-
     def chooseCandMaximizingIG(self, candidates):
         best_IG = (-1, -1, np.array([0.5, 0.5]))
         for cand in candidates:
