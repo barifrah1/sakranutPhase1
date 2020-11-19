@@ -57,7 +57,7 @@ class DataLoader:
         self.data['month_launched'] = self.data['month_launched'].astype('category')        
         self.data[cat_columns] = self.data[cat_columns].apply(
             lambda x: x.cat.codes)
-        Var_Corr = self.data.corr()
+        #Var_Corr = self.data.corr()
         # plot the heatmap and annotation on it
         # sns.heatmap(Var_Corr, xticklabels=Var_Corr.columns,
         #            yticklabels=Var_Corr.columns, annot=True)
@@ -69,12 +69,24 @@ class DataLoader:
         self.data['duration_level'] = 0  # 0 - short-mid , 1-mid-long ,
         self.data['ratio_level'] = 0
         # goal bins according distribution
-        self.data.loc[(self.data['usd_goal_real'] <= 2000), 'goal_level'] = 0
-        self.data.loc[((self.data['usd_goal_real'] > 2000) & (
-            self.data['usd_goal_real'] <= 5000)), 'goal_level'] = 1
-        self.data.loc[((self.data['usd_goal_real'] > 5000) & (
-            self.data['usd_goal_real'] <= 15000)), 'goal_level'] = 2
-        self.data.loc[(self.data['usd_goal_real'] > 15000), 'goal_level'] = 3
+        self.data.loc[(self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.1)), 'goal_level'] = 0
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.1) ) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.2) )), 'goal_level'] = 1
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.2) ) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.3) )), 'goal_level'] = 2
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.3) ) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.4) )), 'goal_level'] = 3
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.4) ) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.5) )), 'goal_level'] = 4
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.5) ) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.6) )), 'goal_level'] = 5 
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.6) ) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.7) )), 'goal_level'] = 6  
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.7) ) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.8) )), 'goal_level'] = 7  
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.8) ) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.9) )), 'goal_level'] = 8                          
+        self.data.loc[(self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.9)), 'goal_level'] = 9  
         # pledges bins
         """self.data.loc[(self.data['usd_pledged_real'] <= 5),
                       'pledged_level'] = 0
@@ -98,10 +110,7 @@ class DataLoader:
         """self.data = self.data.drop(
             ['usd_pledged_real', 'usd_goal_real', 'duration', 'ratio'], 1)
         """
-        # reorder columns
-        """self.data = self.data[['main_category', 'country', 'goal_level',
-                               'pledged_level', 'duration_level','ratio_level', 'state']]
-        """
+        
         # outlyers removal                                
         self.data=self.data[self.data['usd_goal_real']>20.0]
         self.data=self.data[self.data['ratio']<100]
@@ -111,7 +120,7 @@ class DataLoader:
 
 
         #balance data:
-        """        g=self.data.groupby('state')
+        """g=self.data.groupby('state')
         self.data=g.apply(lambda x: x.sample(g.size().min()).reset_index(drop=True))   
         self.data[cat_columns] = self.data[cat_columns].apply(lambda x: x.cat.codes)
         """
