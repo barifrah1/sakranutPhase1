@@ -3,6 +3,7 @@ import pandas as pd
 import scipy.stats
 import matplotlib.pyplot as plt
 from bayesClassifier import BayesClassifier
+import tqdm
 from tqdm import tqdm
 
 

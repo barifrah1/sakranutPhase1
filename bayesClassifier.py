@@ -3,6 +3,7 @@ import pandas as pd
 import scipy.stats
 import matplotlib.pyplot as plt
 import itertools
+import tqdm
 from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_auc_score
@@ -28,8 +29,12 @@ class BayesClassifier:
         # uniform distribution over all variables
         # 2 options: succuess of falil each has 0.5 probabilty at start time
         self.theta = np.ones(numOfUniqueValues)/2
-        """self.theta[:, 2, 1] = 0.9
-        self.theta[:, 2, 0] = 0.1"""
+        self.theta[:, 2, 1] = 0.69
+        self.theta[:, 2, 0] = 0.31
+        self.theta[:,1,1]=0.65
+        self.theta[:,1,0]=0.35
+        self.theta[:,0,1]=0.41
+        self.theta[:,0,0]=0.59
         return self.theta
 
     def step(self, row):
