@@ -9,7 +9,7 @@ import seaborn as sns
 class DataLoader:
     def __init__(self, args):
         self.args = args
-        self.data = pd.read_csv(self.args['fileName'], nrows=300000)
+        self.data = pd.read_csv(self.args['fileName'])
 
     def split_train_test(self):
         msk = np.random.rand(len(self.data)) < self.args['trainSize']
@@ -27,11 +27,11 @@ class DataLoader:
             self.data['deadline'] - self.data['launched']).dt.days
         """
 
-        # ignore live\cancel\other because lower density        
+        # ignore live\cancel\other because lower density
         self.data = self.data.loc[self.data['state'].isin(
-            ['failed', 'successful'])] 
-        # drop na values   
-        self.data = self.data.dropna()   
+            ['failed', 'successful'])]
+        # drop na values
+        self.data = self.data.dropna()
         # self.data['country'].value_counts(normalize=True)
         # => US and gb is almost 80% of the self.data =>dimension reduction
         self.data.loc[~self.data['country'].isin(
@@ -39,22 +39,24 @@ class DataLoader:
         self.data['cat_sub_cat'] = self.data['main_category'] + \
             '_'+self.data['category']
         # feature removal
-        self.data = self.data.drop(['ID','goal','pledged','usd pledged',
-                  'name','deadline','launched','category','main_category','backers','usd_pledged_real'], 1)
+        self.data = self.data.drop(['ID', 'goal', 'pledged', 'usd pledged',
+                                    'name', 'deadline', 'launched', 'category', 'main_category', 'backers', 'usd_pledged_real'], 1)
 
-        cat_columns = ['cat_sub_cat', 'state', 'country','month_launched']
+        cat_columns = ['cat_sub_cat', 'state', 'country', 'month_launched']
         # convert to categorial var
-        #ratio  of  mean pledged of the same cat_Sub_cat before the project started
-        self.data['ratio']=(self.data['pledged_s'])/(self.data['usd_goal_real'])
-        #log transformation of usd_goal_real
-        self.data['goal_log']=np.log2(self.data['usd_goal_real'])
-        self.data['int_log']=self.data.goal_log.astype(int)
+        # ratio  of  mean pledged of the same cat_Sub_cat before the project started
+        self.data['ratio'] = (self.data['pledged_s']) / \
+            (self.data['usd_goal_real'])
+        # log transformation of usd_goal_real
+        self.data['goal_log'] = np.log2(self.data['usd_goal_real'])
+        self.data['int_log'] = self.data.goal_log.astype(int)
 
         self.data['cat_sub_cat'] = self.data['cat_sub_cat'].astype('category')
         self.data['currency'] = self.data['currency'].astype('category')
         self.data['state'] = self.data['state'].astype('category')
         self.data['country'] = self.data['country'].astype('category')
-        self.data['month_launched'] = self.data['month_launched'].astype('category')        
+        self.data['month_launched'] = self.data['month_launched'].astype(
+            'category')
         self.data[cat_columns] = self.data[cat_columns].apply(
             lambda x: x.cat.codes)
         #Var_Corr = self.data.corr()
@@ -69,24 +71,26 @@ class DataLoader:
         self.data['duration_level'] = 0  # 0 - short-mid , 1-mid-long ,
         self.data['ratio_level'] = 0
         # goal bins according distribution
-        self.data.loc[(self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.1)), 'goal_level'] = 0
-        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.1) ) & (
-            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.2) )), 'goal_level'] = 1
-        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.2) ) & (
-            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.3) )), 'goal_level'] = 2
-        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.3) ) & (
-            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.4) )), 'goal_level'] = 3
-        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.4) ) & (
-            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.5) )), 'goal_level'] = 4
-        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.5) ) & (
-            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.6) )), 'goal_level'] = 5 
-        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.6) ) & (
-            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.7) )), 'goal_level'] = 6  
-        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.7) ) & (
-            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.8) )), 'goal_level'] = 7  
-        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.8) ) & (
-            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.9) )), 'goal_level'] = 8                          
-        self.data.loc[(self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.9)), 'goal_level'] = 9  
+        self.data.loc[(self.data['usd_goal_real'] <=
+                       self.data.usd_goal_real.quantile(0.1)), 'goal_level'] = 0
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.1)) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.2))), 'goal_level'] = 1
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.2)) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.3))), 'goal_level'] = 2
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.3)) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.4))), 'goal_level'] = 3
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.4)) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.5))), 'goal_level'] = 4
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.5)) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.6))), 'goal_level'] = 5
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.6)) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.7))), 'goal_level'] = 6
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.7)) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.8))), 'goal_level'] = 7
+        self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.8)) & (
+            self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.9))), 'goal_level'] = 8
+        self.data.loc[(self.data['usd_goal_real'] >
+                       self.data.usd_goal_real.quantile(0.9)), 'goal_level'] = 9
         # pledges bins
         """self.data.loc[(self.data['usd_pledged_real'] <= 5),
                       'pledged_level'] = 0
@@ -110,16 +114,15 @@ class DataLoader:
         """self.data = self.data.drop(
             ['usd_pledged_real', 'usd_goal_real', 'duration', 'ratio'], 1)
         """
-        
-        # outlyers removal                                
-        self.data=self.data[self.data['usd_goal_real']>20.0]
-        self.data=self.data[self.data['ratio']<100]
-        #date final choose        
+
+        # outlyers removal
+        self.data = self.data[self.data['usd_goal_real'] > 20.0]
+        self.data = self.data[self.data['ratio'] < 100]
+        # date final choose
         self.data = self.data[['cat_sub_cat', 'country', 'goal_level',
-                               'duration_level','month_launched','ratio_level', 'state']]
+                               'duration_level', 'month_launched', 'ratio_level', 'state']]
 
-
-        #balance data:
+        # balance data:
         """g=self.data.groupby('state')
         self.data=g.apply(lambda x: x.sample(g.size().min()).reset_index(drop=True))   
         self.data[cat_columns] = self.data[cat_columns].apply(lambda x: x.cat.codes)

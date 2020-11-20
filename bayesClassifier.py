@@ -7,6 +7,7 @@ import tqdm
 from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import roc_auc_score
+import seaborn as sn
 
 
 class BayesClassifier:
@@ -31,10 +32,10 @@ class BayesClassifier:
         self.theta = np.ones(numOfUniqueValues)/2
         self.theta[:, 2, 1] = 0.69
         self.theta[:, 2, 0] = 0.31
-        self.theta[:,1,1]=0.65
-        self.theta[:,1,0]=0.35
-        self.theta[:,0,1]=0.41
-        self.theta[:,0,0]=0.59
+        self.theta[:, 1, 1] = 0.65
+        self.theta[:, 1, 0] = 0.35
+        self.theta[:, 0, 1] = 0.41
+        self.theta[:, 0, 0] = 0.59
         return self.theta
 
     def step(self, row):
@@ -123,6 +124,7 @@ class BayesClassifier:
             desicion = 1 if prob_vector[1] >= 0.5 else 0
             pred.append(desicion)
         cm = confusion_matrix(
-            test_set[:, -1], pred, np.array([1, 0]), normalize='true')
+            test_set[:, -1], pred, normalize='true')
         auc = roc_auc_score(test_set[:, -1], pred)
-        return (cm, auc)
+        df_cm = pd.DataFrame(cm, range(2), range(2))
+        return (df_cm, auc)
