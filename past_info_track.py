@@ -26,7 +26,7 @@ for index, row in s.iterrows():
     if pd.isnull(val1):
         continue
     data.loc[index,'pledged_s']=int(val1)
-    if (index%10000==0):
-        print("index",index)
+    #if (index%10000==0):
+    #    print("index",index)
         
 #data.to_csv("outf.csv", index = False)

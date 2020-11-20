@@ -49,7 +49,8 @@ class DataLoader:
         #log transformation of usd_goal_real
         self.data['goal_log']=np.log2(self.data['usd_goal_real'])
         self.data['int_log']=self.data.goal_log.astype(int)
-
+        
+        self.data['int_log'] = self.data['int_log'].astype('category')
         self.data['cat_sub_cat'] = self.data['cat_sub_cat'].astype('category')
         self.data['currency'] = self.data['currency'].astype('category')
         self.data['state'] = self.data['state'].astype('category')
