@@ -9,11 +9,7 @@ import seaborn as sns
 class DataLoader:
     def __init__(self, args):
         self.args = args
-<<<<<<< HEAD
-        self.data = pd.read_csv(self.args['fileName'])#, nrows=20000)
-=======
         self.data = pd.read_csv(self.args['fileName'], nrows=200000)
->>>>>>> f31a06a59f1a444e1686d7559e5710df979a08be
 
     def split_train_test(self):
         msk = np.random.rand(len(self.data)) < self.args['trainSize']
