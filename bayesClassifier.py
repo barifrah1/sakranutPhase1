@@ -35,6 +35,8 @@ class BayesClassifier:
         self.theta[:,1,0]=0.35
         self.theta[:,0,1]=0.41
         self.theta[:,0,0]=0.59
+        self.theta[:,0,:,0]=0.95
+        self.theta[:,0,:,1]=0.05
         return self.theta
 
     def step(self, row):

@@ -9,7 +9,7 @@ import seaborn as sns
 class DataLoader:
     def __init__(self, args):
         self.args = args
-        self.data = pd.read_csv(self.args['fileName'], nrows=300000)
+        self.data = pd.read_csv(self.args['fileName'])#, nrows=20000)
 
     def split_train_test(self):
         msk = np.random.rand(len(self.data)) < self.args['trainSize']
@@ -68,6 +68,7 @@ class DataLoader:
         self.data['pledged_level'] = 0  # 0 - low ,1-mid,2 - high,3-very high
         self.data['duration_level'] = 0  # 0 - short-mid , 1-mid-long ,
         self.data['ratio_level'] = 0
+        self.data['backers_s_level'] = 0
         # goal bins according distribution
         self.data.loc[(self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.1)), 'goal_level'] = 0
         self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.1) ) & (
@@ -87,16 +88,13 @@ class DataLoader:
         self.data.loc[((self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.8) ) & (
             self.data['usd_goal_real'] <= self.data.usd_goal_real.quantile(0.9) )), 'goal_level'] = 8                          
         self.data.loc[(self.data['usd_goal_real'] > self.data.usd_goal_real.quantile(0.9)), 'goal_level'] = 9  
-        # pledges bins
-        """self.data.loc[(self.data['usd_pledged_real'] <= 5),
-                      'pledged_level'] = 0
-        self.data.loc[((self.data['usd_pledged_real'] > 5) & (
-            self.data['usd_pledged_real'] <= 788)), 'pledged_level'] = 1
-        self.data.loc[((self.data['usd_pledged_real'] > 788) & (
-            self.data['usd_pledged_real'] <= 4608)), 'pledged_level'] = 2
-        self.data.loc[(self.data['usd_pledged_real'] > 4608),
-                      'pledged_level'] = 3
-        """
+
+        #backers_s bins
+        self.data.loc[(self.data['backers_s']<=0),'backers_s_level']=0
+        self.data.loc[((self.data['backers_s']>0) & (self.data['backers_s']<=16)),'backers_s_level']=1
+        self.data.loc[((self.data['backers_s']>16) & (self.data['backers_s']<=100)),'backers_s_level']=2
+        self.data.loc[((self.data['backers_s']>100) & (self.data['backers_s']<=649)),'backers_s_level']=3
+        self.data.loc[(self.data['backers_s']>649),'backers_s_level']=4
         # duration bins
         self.data.loc[(self.data['duration'] <= 30), 'duration_level'] = 0
         self.data.loc[(self.data['duration'] > 30), 'duration_level'] = 1
@@ -106,17 +104,14 @@ class DataLoader:
         self.data.loc[((self.data['ratio'] > 0.5) & (
             self.data['ratio'] <= 1)), 'ratio_level'] = 1
         self.data.loc[(self.data['ratio'] > 1), 'ratio_level'] = 2
-        # phase 3 of drops results of bins creation
-        """self.data = self.data.drop(
-            ['usd_pledged_real', 'usd_goal_real', 'duration', 'ratio'], 1)
-        """
-        
+
         # outlyers removal                                
         self.data=self.data[self.data['usd_goal_real']>20.0]
         self.data=self.data[self.data['ratio']<100]
+        self.data=self.data[self.data['backers_s']<5000]
         #date final choose        
-        self.data = self.data[['cat_sub_cat', 'country', 'goal_level',
-                               'duration_level','month_launched','ratio_level', 'state']]
+        self.data = self.data[['cat_sub_cat', 'country','goal_level',
+                               'duration_level','month_launched','backers_s_level','ratio_level', 'state']]
 
 
         #balance data:
