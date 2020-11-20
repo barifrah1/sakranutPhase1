@@ -129,4 +129,5 @@ dmypy.json
 .pyre/
 
 #csv
+*.csv
 ks-projects-201801.csv
