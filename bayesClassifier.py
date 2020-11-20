@@ -122,7 +122,8 @@ class BayesClassifier:
             state = row[-1]  # get state 0-failed 1-success
             desicion = 1 if prob_vector[1] >= 0.5 else 0
             pred.append(desicion)
-        cm = confusion_matrix(
-            test_set[:, -1], pred, np.array([1, 0]), normalize='true')
+        y_actu = pd.Series(list(test_set[:, -1]), name='Actual')
+        y_pred = pd.Series(pred, name='Predicted')
+        df_confusion = pd.crosstab(y_actu, y_pred)        
         auc = roc_auc_score(test_set[:, -1], pred)
-        return (cm, auc)
+        return (df_confusion, auc)
