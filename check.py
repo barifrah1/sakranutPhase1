@@ -1,20 +1,17 @@
 import numpy as np
+import time
+import pandas as pd
+data=pd.read_csv('ks-projects-201801.csv')
+data['cat_sub_cat'] = data['main_category'] +'_'+data['category']
+data =data.loc[data['state'].isin(['failed', 'successful'])] 
 
+start = time.time()
+print(data[(data['state']=='successful') & (data['state']=='successful')]['usd_pledged_real'].mean())
+end = time.time()
+print("one way",end - start)
 
-def hello_world():
-    print("hello for the best sakranut project members")
-    print("hi yaron")
-
-
-def gg():
-    arr = np.array([[2, 4], [3, 1]])
-    print(arr)
-    s = "arr[0,1]"
-    m = eval(s)
-    print(m)
-
-
-if __name__ == "__main__":
-    hello_world()
-    print('a')
-    gg()
+start = time.time()
+x=data.loc[(data['state']=='successful') & (data['backers']>10), 'usd_pledged_real'].mean()
+print(x)
+end = time.time()
+print("two way",end - start)

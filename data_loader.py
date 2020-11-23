@@ -9,7 +9,7 @@ import seaborn as sns
 class DataLoader:
     def __init__(self, args):
         self.args = args
-        self.data = pd.read_csv(self.args['fileName'], nrows=200000)
+        self.data = pd.read_csv(self.args['fileName'], nrows=40000)
 
     def split_train_test(self):
         msk = np.random.rand(len(self.data)) < self.args['trainSize']
@@ -48,9 +48,6 @@ class DataLoader:
         self.data['ratio']=(self.data['pledged_s'])/(self.data['usd_goal_real'])
         #log transformation of usd_goal_real
         self.data['goal_log']=np.log2(self.data['usd_goal_real'])
-        self.data['int_log']=self.data.goal_log.astype(int)
-        
-        self.data['int_log'] = self.data['int_log'].astype('category')
         self.data['cat_sub_cat'] = self.data['cat_sub_cat'].astype('category')
         self.data['currency'] = self.data['currency'].astype('category')
         self.data['state'] = self.data['state'].astype('category')
@@ -58,6 +55,7 @@ class DataLoader:
         self.data['month_launched'] = self.data['month_launched'].astype('category')        
         self.data[cat_columns] = self.data[cat_columns].apply(
             lambda x: x.cat.codes)
+        self.data['mean_ratio']=(self.data['mean_pl'])/(self.data['usd_goal_real'])
         #Var_Corr = self.data.corr()
         # plot the heatmap and annotation on it
         # sns.heatmap(Var_Corr, xticklabels=Var_Corr.columns,
@@ -112,7 +110,7 @@ class DataLoader:
         self.data=self.data[self.data['backers_s']<5000]
         #date final choose        
         self.data = self.data[['cat_sub_cat', 'country','goal_level',
-                               'duration_level','month_launched','backers_s_level','ratio_level', 'state']]
+                               'duration_level','month_launched', 'state']]
 
 
         #balance data:
