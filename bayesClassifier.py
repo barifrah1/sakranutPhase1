@@ -69,6 +69,7 @@ class BayesClassifier:
         # compute IG between p_before and p_after
         D_KL_t = self.compute_kl_div(p_before, p_after)
         return D_KL_t
+
     # get priors and posterior of specific row and compute IG
 
     def compute_kl_div(self, p_before, p_after):

@@ -1,13 +1,6 @@
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
+
     "python.pythonPath": "C:\\Users\\Bar Ifrah\\AppData\\Local\\Programs\\Python\\Python37\\python.exe",
-=======
-    "python.pythonPath": "C:\\Users\\Bar Ifrah\\AppData\\Local\\Programs\\Python\\Python37\\python.exe",
->>>>>>> 144fd5e415da251ea9a60b92039df801613f400a
-=======
-    "python.pythonPath": "C:\\Users\\yaron\\anaconda3\\python.exe",
->>>>>>> ea4ed4a7df8a3a04bc1daa290573d47286f645a3
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true
 }

@@ -8,6 +8,7 @@ if __name__ == '__main__':
     data_loader = DataLoader(args)
     # preprocessing
     data, columnsInfo = data_loader.preprocess()
+
     # split data to train and test
     #train, test_s = data_loader.split_train_test()
 
