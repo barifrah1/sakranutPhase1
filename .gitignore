@@ -128,5 +128,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+
 #csv
 *.csv
+ks-projects-201801.csv
+
+
+setting.json

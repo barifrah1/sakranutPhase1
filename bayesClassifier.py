@@ -26,16 +26,21 @@ class BayesClassifier:
     def initialize_priors(self):
         # columnsInfo_structure - 'COLUMN_NAME': index 0, 'COLUMN_UNIQUE_VALUES': index 1
         numOfUniqueValues = np.fromiter(
-            map(lambda x: x[1], self.columnsInfo), dtype=np.int)  # create a vector of num of unique value for each column
+            map(lambda x: x[1], self.columnsInfo), dtype=np.int)
+        print("num:", numOfUniqueValues)
+        # create a vector of num of unique value for each column
         # uniform distribution over all variables
         # 2 options: succuess of falil each has 0.5 probabilty at start time
         self.theta = np.ones(numOfUniqueValues)/2
-        self.theta[:, 2, 1] = 0.69
-        self.theta[:, 2, 0] = 0.31
-        self.theta[:, 1, 1] = 0.65
-        self.theta[:, 1, 0] = 0.35
-        self.theta[:, 0, 1] = 0.41
-        self.theta[:, 0, 0] = 0.59
+        self.theta[:, :, :, 0, 1] = 0.529388
+        self.theta[:, :, :, 0, 0] = 0.470612
+        self.theta[:, :, :, 1, 1] = 0.475483
+        self.theta[:, :, :, 1, 0] = 0.524517
+        self.theta[:, :, :, 2, 1] = 0.390253
+        self.theta[:, :, :, 2, 0] = 0.609747
+        self.theta[:, :, :, 3, 1] = 0.253651
+        self.theta[:, :, :, 3, 0] = 0.746349
+
         return self.theta
 
     def step(self, row):
